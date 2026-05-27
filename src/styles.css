@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+@layer components {
+  .input {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid #9bd3df;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 16px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input:focus {
+    border-color: #ffc629;
+    box-shadow: 0 0 0 3px rgba(255, 198, 41, 0.22);
+  }
+}
+
