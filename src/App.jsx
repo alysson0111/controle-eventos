@@ -726,7 +726,7 @@ function SistemaEventos({ user }) {
       <header className="bg-gradient-to-r from-cyan-900 via-teal-700 to-cyan-600 text-white px-6 py-8 shadow-xl shadow-cyan-950/25 border-b border-white/20">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <p className="inline-flex rounded-full border border-white/30 bg-white/15 px-4 py-2 text-sm text-white font-black">Eficiencia e comodidade para seus eventos</p>
+            <p className="inline-flex rounded-full border border-white/30 bg-white/15 px-4 py-2 text-sm text-white font-black">Eficiência e comodidade para seus eventos</p>
             <h1 className="text-3xl md:text-5xl font-black">Controle de Eventos</h1>
             <p className="text-cyan-50 max-w-2xl mt-2">Eventos, itens de montagem e contratos em um unico painel.</p>
           </div>
