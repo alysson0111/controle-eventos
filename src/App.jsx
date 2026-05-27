@@ -728,7 +728,7 @@ function SistemaEventos({ user }) {
           <div>
             <p className="inline-flex rounded-full border border-white/30 bg-white/15 px-4 py-2 text-sm text-white font-black">Eficiência e comodidade para seus eventos</p>
             <h1 className="text-3xl md:text-5xl font-black">Controle de Eventos</h1>
-            <p className="text-cyan-50 max-w-2xl mt-2">Eventos, itens de montagem e contratos em um unico painel.</p>
+            <p className="text-cyan-50 max-w-2xl mt-2">Eventos, itens de montagem e contratos em um único painel.</p>
           </div>
 
           <div className="bg-white/15 border border-white/30 rounded-3xl p-4 flex items-center gap-4 shadow-sm backdrop-blur">
