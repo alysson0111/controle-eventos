@@ -417,6 +417,7 @@ function SistemaEventos({ user }) {
   const [carregando, setCarregando] = useState(true);
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("Todos");
+  const [mesEventos, setMesEventos] = useState("");
   const [faturamentoModo, setFaturamentoModo] = useState("total");
   const [mesFaturamento, setMesFaturamento] = useState(() => new Date().toISOString().slice(0, 7));
   const [abaAtiva, setAbaAtiva] = useState("eventos");
@@ -697,9 +698,10 @@ function SistemaEventos({ user }) {
       const texto = `${evento.nome} ${evento.tema} ${evento.cliente} ${evento.local} ${evento.status} ${itensTexto}`.toLowerCase();
       const combinaBusca = texto.includes(busca.toLowerCase());
       const combinaStatus = statusFiltro === "Todos" || evento.status === statusFiltro;
-      return combinaBusca && combinaStatus;
+      const combinaMes = !mesEventos || (evento.data || "").startsWith(mesEventos);
+      return combinaBusca && combinaStatus && combinaMes;
     });
-  }, [eventos, busca, statusFiltro]);
+  }, [eventos, busca, statusFiltro, mesEventos]);
 
   const resumo = useMemo(() => {
     const total = eventos.length;
@@ -906,6 +908,16 @@ function SistemaEventos({ user }) {
                 <div className="relative">
                   <Search size={18} className="absolute left-3 top-3 text-slate-400" />
                   <input className="input pl-10" placeholder="Buscar evento ou item..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+                </div>
+                <div className="relative">
+                  <CalendarDays size={18} className="absolute left-3 top-3 text-slate-400" />
+                  <input
+                    type="month"
+                    className="input pl-10"
+                    value={mesEventos}
+                    onChange={(e) => setMesEventos(e.target.value)}
+                    title="Filtrar eventos por mes"
+                  />
                 </div>
                 <select className="input" value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
                   <option>Todos</option>
