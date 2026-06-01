@@ -440,7 +440,8 @@ function SistemaEventos({ user }) {
     const { data, error } = await supabase
       .from("eventos")
       .select("*")
-      .order("data", { ascending: true });
+      .order("data", { ascending: false })
+      .order("created_at", { ascending: false });
 
     if (error) {
       setErro(error.message);
