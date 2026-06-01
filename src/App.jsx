@@ -810,20 +810,6 @@ function SistemaEventos({ user }) {
             <form onSubmit={salvarEvento} className="space-y-3">
               <Campo label="Nome do evento"><input className="input" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Ex: Casamento, aniversario..." /></Campo>
               <Campo label="Tema"><input className="input" value={form.tema} onChange={(e) => setForm({ ...form, tema: e.target.value })} placeholder="Ex: Jardim encantado, tropical..." /></Campo>
-              <Campo label="Nome da contratante"><input className="input" value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Nome da contratante" /></Campo>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Campo label="CPF/CNPJ"><input className="input" value={form.clienteDocumento} onChange={(e) => setForm({ ...form, clienteDocumento: formatarCpf(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteDocumento", formatarCpf)} placeholder="000.000.000-00" /></Campo>
-                <Campo label="Telefone"><input className="input" value={form.clienteTelefone} onChange={(e) => setForm({ ...form, clienteTelefone: formatarTelefone(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteTelefone", formatarTelefone)} placeholder="(000) 0 0000-0000" /></Campo>
-              </div>
-
-              <Campo label="Endereco do cliente"><input className="input" value={form.clienteEndereco} onChange={(e) => setForm({ ...form, clienteEndereco: e.target.value })} placeholder="Rua, numero, cidade" /></Campo>
-              <Campo label="Nome da contratada"><input className="input" value={form.contratadaNome} onChange={(e) => setForm({ ...form, contratadaNome: e.target.value })} placeholder="Nome da contratada" /></Campo>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Campo label="CPF/CNPJ"><input className="input" value={form.contratadaDocumento} onChange={(e) => setForm({ ...form, contratadaDocumento: formatarCpf(e.target.value) })} onPaste={(e) => colarFormatado(e, "contratadaDocumento", formatarCpf)} placeholder="000.000.000-00" /></Campo>
-                <Campo label="Telefone"><input className="input" value={form.contratadaTelefone} onChange={(e) => setForm({ ...form, contratadaTelefone: formatarTelefone(e.target.value) })} onPaste={(e) => colarFormatado(e, "contratadaTelefone", formatarTelefone)} placeholder="(000) 0 0000-0000" /></Campo>
-              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <Campo label="Data"><input type="date" className="input" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} /></Campo>
@@ -848,6 +834,21 @@ function SistemaEventos({ user }) {
               <Campo label="Data para pagamento do sinal">
                 <input type="date" className="input" value={form.dataSinal} onChange={(e) => setForm({ ...form, dataSinal: e.target.value })} />
               </Campo>
+
+              <Campo label="Nome da contratante"><input className="input" value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Nome da contratante" /></Campo>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Campo label="CPF/CNPJ"><input className="input" value={form.clienteDocumento} onChange={(e) => setForm({ ...form, clienteDocumento: formatarCpf(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteDocumento", formatarCpf)} placeholder="000.000.000-00" /></Campo>
+                <Campo label="Telefone"><input className="input" value={form.clienteTelefone} onChange={(e) => setForm({ ...form, clienteTelefone: formatarTelefone(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteTelefone", formatarTelefone)} placeholder="(000) 0 0000-0000" /></Campo>
+              </div>
+
+              <Campo label="Endereco do cliente"><input className="input" value={form.clienteEndereco} onChange={(e) => setForm({ ...form, clienteEndereco: e.target.value })} placeholder="Rua, numero, cidade" /></Campo>
+              <Campo label="Nome da contratada"><input className="input" value={form.contratadaNome} onChange={(e) => setForm({ ...form, contratadaNome: e.target.value })} placeholder="Nome da contratada" /></Campo>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Campo label="CPF/CNPJ"><input className="input" value={form.contratadaDocumento} onChange={(e) => setForm({ ...form, contratadaDocumento: formatarCpf(e.target.value) })} onPaste={(e) => colarFormatado(e, "contratadaDocumento", formatarCpf)} placeholder="000.000.000-00" /></Campo>
+                <Campo label="Telefone"><input className="input" value={form.contratadaTelefone} onChange={(e) => setForm({ ...form, contratadaTelefone: formatarTelefone(e.target.value) })} onPaste={(e) => colarFormatado(e, "contratadaTelefone", formatarTelefone)} placeholder="(000) 0 0000-0000" /></Campo>
+              </div>
 
               <FormasPagamentoSelecionaveis
                 selecionadas={textoParaLista(form.formaPagamento)}
