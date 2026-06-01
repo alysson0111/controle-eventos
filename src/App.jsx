@@ -904,12 +904,12 @@ function SistemaEventos({ user }) {
                 <p className="text-sm text-slate-500">Dados carregados direto do Supabase.</p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative">
+              <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap md:flex-1 md:justify-end">
+                <div className="relative min-w-0 sm:flex-1 sm:basis-64">
                   <Search size={18} className="absolute left-3 top-3 text-slate-400" />
                   <input className="input pl-10" placeholder="Buscar evento ou item..." value={busca} onChange={(e) => setBusca(e.target.value)} />
                 </div>
-                <div className="relative">
+                <div className="relative min-w-0 sm:w-44 sm:flex-none">
                   <CalendarDays size={18} className="absolute left-3 top-3 text-slate-400" />
                   <input
                     type="month"
@@ -919,7 +919,7 @@ function SistemaEventos({ user }) {
                     title="Filtrar eventos por mes"
                   />
                 </div>
-                <select className="input" value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
+                <select className="input sm:w-36 sm:flex-none" value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
                   <option>Todos</option>
                   <option>Confirmado</option>
                   <option>Pendente</option>
