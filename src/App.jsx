@@ -1253,6 +1253,9 @@ function CustosPainel({
   excluirCusto,
   cancelarEdicao,
 }) {
+  const [modoEventosCusto, setModoEventosCusto] = useState("todos");
+  const [mesEventosCusto, setMesEventosCusto] = useState(() => new Date().toISOString().slice(0, 7));
+
   const custosPorEvento = useMemo(() => {
     return eventos.map((evento) => {
       const custosEvento = custos.filter((custo) => custo.evento_id === evento.id);
@@ -1272,6 +1275,18 @@ function CustosPainel({
   const totalCustos = custos.reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
   const totalCustosVinculados = custos.filter((custo) => custo.evento_id).reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
   const totalCustosGerais = custosGerais.reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
+  const eventosParaCusto = useMemo(() => {
+    const filtrados = modoEventosCusto === "mes"
+      ? eventos.filter((evento) => (evento.data || "").startsWith(mesEventosCusto))
+      : eventos;
+
+    if (!custoForm.eventoId || filtrados.some((evento) => evento.id === custoForm.eventoId)) {
+      return filtrados;
+    }
+
+    const eventoSelecionado = eventos.find((evento) => evento.id === custoForm.eventoId);
+    return eventoSelecionado ? [eventoSelecionado, ...filtrados] : filtrados;
+  }, [eventos, modoEventosCusto, mesEventosCusto, custoForm.eventoId]);
 
   function nomeContratante(custo) {
     const evento = eventos.find((item) => item.id === custo.evento_id);
@@ -1288,16 +1303,27 @@ function CustosPainel({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white/90 rounded-3xl shadow-lg shadow-amber-100/80 border border-amber-100 p-5">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="bg-gradient-to-br from-yellow-400 to-amber-500 text-cyan-950 p-2 rounded-2xl"><DollarSign size={20} /></div>
-            <h2 className="text-xl font-black">{editandoCustoId ? "Editar Custo" : "Novo Custo"}</h2>
+          <div className="flex flex-col gap-3 mb-5">
+            <div className="flex items-center gap-2">
+              <div className="bg-gradient-to-br from-yellow-400 to-amber-500 text-cyan-950 p-2 rounded-2xl"><DollarSign size={20} /></div>
+              <h2 className="text-xl font-black">{editandoCustoId ? "Editar Custo" : "Novo Custo"}</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <select className="input" value={modoEventosCusto} onChange={(e) => setModoEventosCusto(e.target.value)}>
+                <option value="todos">Todos os eventos</option>
+                <option value="mes">Filtrar por mes</option>
+              </select>
+              {modoEventosCusto === "mes" && (
+                <input type="month" className="input" value={mesEventosCusto} onChange={(e) => setMesEventosCusto(e.target.value)} />
+              )}
+            </div>
           </div>
 
           <form onSubmit={salvarCusto} className="space-y-3">
             <Campo label="Evento">
               <select className="input" value={custoForm.eventoId} onChange={(e) => setCustoForm({ ...custoForm, eventoId: e.target.value })}>
                 <option value="">Custo geral, sem evento especifico</option>
-                {eventos.map((evento) => (
+                {eventosParaCusto.map((evento) => (
                   <option key={evento.id} value={evento.id}>{evento.cliente || "Contratante nao informado"} - {formatarData(evento.data)}</option>
                 ))}
               </select>
