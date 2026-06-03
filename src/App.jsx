@@ -1273,9 +1273,9 @@ function CustosPainel({
   const totalCustosVinculados = custos.filter((custo) => custo.evento_id).reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
   const totalCustosGerais = custosGerais.reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
 
-  function nomeEvento(custo) {
+  function nomeContratante(custo) {
     const evento = eventos.find((item) => item.id === custo.evento_id);
-    return evento ? `${evento.nome} - ${formatarData(evento.data)}` : "Custo geral";
+    return evento ? `${evento.cliente || "Contratante nao informado"} - ${formatarData(evento.data)}` : "Custo geral";
   }
 
   return (
@@ -1298,7 +1298,7 @@ function CustosPainel({
               <select className="input" value={custoForm.eventoId} onChange={(e) => setCustoForm({ ...custoForm, eventoId: e.target.value })}>
                 <option value="">Custo geral, sem evento especifico</option>
                 {eventos.map((evento) => (
-                  <option key={evento.id} value={evento.id}>{evento.nome} - {formatarData(evento.data)}</option>
+                  <option key={evento.id} value={evento.id}>{evento.cliente || "Contratante nao informado"} - {formatarData(evento.data)}</option>
                 ))}
               </select>
             </Campo>
@@ -1346,7 +1346,7 @@ function CustosPainel({
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div>
                       <p className="font-black text-slate-900">{custo.descricao}</p>
-                      <p className="text-sm text-slate-500">{nomeEvento(custo)} | {formatarData(custo.data)}</p>
+                      <p className="text-sm text-slate-500">{nomeContratante(custo)} | {formatarData(custo.data)}</p>
                       {custo.observacao && <p className="text-sm text-slate-600 mt-2">{custo.observacao}</p>}
                     </div>
                     <div className="flex items-center gap-2">
@@ -1379,7 +1379,7 @@ function CustosPainel({
               <thead>
                 <tr className="text-left text-slate-500 border-b border-amber-100">
                   <th className="py-3 pr-4">Data</th>
-                  <th className="py-3 pr-4">Evento</th>
+                  <th className="py-3 pr-4">Contratante</th>
                   <th className="py-3 text-right">Valor</th>
                   <th className="py-3 text-right">Custos</th>
                   <th className="py-3 text-right">Liquido</th>
@@ -1389,7 +1389,7 @@ function CustosPainel({
                 {custosPorEvento.map(({ evento, totalCustos, valorLiquido }) => (
                   <tr key={evento.id} className="border-b border-amber-50">
                     <td className="py-3 pr-4 whitespace-nowrap">{formatarData(evento.data)}</td>
-                    <td className="py-3 pr-4 font-bold">{evento.nome}</td>
+                    <td className="py-3 pr-4 font-bold">{evento.cliente}</td>
                     <td className="py-3 text-right">{moeda(evento.valor)}</td>
                     <td className="py-3 text-right text-red-600 font-bold">{moeda(totalCustos)}</td>
                     <td className={`py-3 text-right font-black ${valorLiquido < 0 ? "text-red-600" : "text-cyan-700"}`}>{moeda(valorLiquido)}</td>
