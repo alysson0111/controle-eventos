@@ -23,6 +23,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabaseConfigurado = Boolean(supabaseUrl && supabaseAnonKey);
 const supabase = supabaseConfigurado ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
+const observacoesPadraoContrato = "Nao incluso buffet, bolo e lembrancinhas.";
+
 const formInicial = {
   nome: "",
   tema: "",
@@ -43,7 +45,7 @@ const formInicial = {
   chavePix: "",
   nomePix: "",
   status: "Pendente",
-  observacoes: "",
+  observacoes: observacoesPadraoContrato,
   itens: [],
 };
 
@@ -1386,7 +1388,6 @@ function montarContratoHtml(evento, user) {
   <h2>8. Validade do contrato</h2>
   <p>
     Este contrato so tem validade apos o pagamento conforme Item 4.
-    Nao incluso buffet, bolo e lembrancinhas.
   </p>
 
   <h2>9. Observacoes</h2>
