@@ -23,7 +23,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabaseConfigurado = Boolean(supabaseUrl && supabaseAnonKey);
 const supabase = supabaseConfigurado ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
-const observacoesPadraoContrato = "Nao incluso buffet, bolo e lembrancinhas.";
+const observacoesPadraoContrato = "Não incluso buffet, bolo e lembrancinhas.";
 
 const formInicial = {
   nome: "",
@@ -1670,74 +1670,74 @@ function montarContratoHtml(evento, user) {
 </head>
 <body>
   <div class="acoes"><button onclick="window.print()">Imprimir / salvar PDF</button></div>
-  <h1>Contrato de Prestacao de Servicos para Evento</h1>
+  <h1>Contrato de Prestação de Serviços para Evento</h1>
 
   <p>
-    Pelo presente instrumento particular, as partes abaixo identificadas firmam o presente contrato de prestacao
-    de servicos para o evento <strong>${escaparHtml(evento.nome)}</strong>, conforme condicoes descritas.
+    Pelo presente instrumento particular, as partes abaixo identificadas firmam o presente contrato de prestação
+    de serviços para o evento <strong>${escaparHtml(evento.nome)}</strong>, conforme as condições descritas.
   </p>
   ${evento.tema ? `<p><strong>Tema do evento:</strong> ${escaparHtml(evento.tema)}</p>` : ""}
 
   <h2>1. Partes</h2>
   <p>
     <strong>Contratante:</strong> ${escaparHtml(evento.cliente)}<br />
-    <strong>CPF/CNPJ:</strong> ${escaparHtml(evento.cliente_documento || "Nao informado")}<br />
-    <strong>Telefone:</strong> ${escaparHtml(evento.cliente_telefone || "Nao informado")}<br />
-    <strong>Endereco:</strong> ${escaparHtml(evento.cliente_endereco || "Nao informado")}
+    <strong>CPF/CNPJ:</strong> ${escaparHtml(evento.cliente_documento || "Não informado")}<br />
+    <strong>Telefone:</strong> ${escaparHtml(evento.cliente_telefone || "Não informado")}<br />
+    <strong>Endereço:</strong> ${escaparHtml(evento.cliente_endereco || "Não informado")}
   </p>
   <p>
     <strong>Contratada:</strong> ${escaparHtml(evento.contratada_nome || user.email)}<br />
-    <strong>CPF/CNPJ:</strong> ${escaparHtml(evento.contratada_documento || "Nao informado")}<br />
+    <strong>CPF/CNPJ:</strong> ${escaparHtml(evento.contratada_documento || "Não informado")}<br />
     <strong>Contato:</strong> ${escaparHtml(evento.contratada_telefone || user.email)}
   </p>
 
   <h2>2. Dados do evento</h2>
   <p>
     <strong>Data:</strong> ${formatarData(evento.data)}<br />
-    <strong>Horario:</strong> ${escaparHtml(evento.horario || "--:--")}<br />
+    <strong>Horário:</strong> ${escaparHtml(evento.horario || "--:--")}<br />
     <strong>Local:</strong> ${escaparHtml(evento.local)}
   </p>
 
-  <h2>3. Itens e materiais incluidos</h2>
+  <h2>3. Itens e materiais incluídos</h2>
   <table>
     <thead>
-      <tr><th>Item</th><th>Qtd.</th><th>Unidade</th><th>Observacao</th></tr>
+      <tr><th>Item</th><th>Qtd.</th><th>Unidade</th><th>Observação</th></tr>
     </thead>
     <tbody>${linhasItens}</tbody>
   </table>
 
   <h2>4. Valor e pagamento</h2>
   <p>
-    O valor total dos servicos e de <strong>${moeda(evento.valor)}</strong>.
+    O valor total dos serviços é de <strong>${moeda(evento.valor)}</strong>.
     ${pagamentoContrato}
   </p>
 
-  <h2>5. Condicoes gerais</h2>
+  <h2>5. Condições gerais</h2>
   <p>
-    A contratada prestara os servicos e disponibilizara os itens listados neste contrato para uso no evento.
-    Alteracoes de data, local, quantidade de itens ou escopo deverao ser acordadas entre as partes.
-    Em caso de alteracao da data, fica consignado a contratada verificar disponibilidade da data pretendida pela contratante.
-    Danos, extravios ou mau uso dos itens durante o periodo de disponibilidade poderao gerar cobranca adicional.
+    A contratada prestará os serviços e disponibilizará os itens listados neste contrato para uso no evento.
+    Alterações de data, local, quantidade de itens ou escopo deverão ser acordadas entre as partes.
+    Em caso de alteração da data, fica consignado que a contratada deverá verificar a disponibilidade da data pretendida pela contratante.
+    Danos, extravios ou mau uso dos itens durante o período de disponibilidade poderão gerar cobrança adicional.
   </p>
 
-  <h2>6. Informacoes importantes</h2>
+  <h2>6. Informações importantes</h2>
   <p>
-    Os valores pagos em carater de entrada em nenhuma hipotese serao devolvidos,
-    independente do motivo alegado pelo contratante.
+    Os valores pagos em caráter de entrada em nenhuma hipótese serão devolvidos,
+    independentemente do motivo alegado pelo contratante.
   </p>
 
-  <h2>7. Concordancia</h2>
+  <h2>7. Concordância</h2>
   <p>
-    O pagamento do sinal conforme item 4 caracteriza concordancia integral deste contrato.
+    O pagamento do sinal conforme item 4 caracteriza concordância integral deste contrato.
   </p>
 
   <h2>8. Validade do contrato</h2>
   <p>
-    Este contrato so tem validade apos o pagamento conforme Item 4.
+    Este contrato só tem validade após o pagamento conforme o item 4.
   </p>
 
-  <h2>9. Observacoes</h2>
-  <p>${escaparHtml(evento.observacoes || "Sem observacoes adicionais.")}</p>
+  <h2>9. Observações</h2>
+  <p>${escaparHtml(evento.observacoes || "Sem observações adicionais.")}</p>
 
 </body>
 </html>`;
@@ -1784,14 +1784,14 @@ function montarPagamentoContrato(evento, saldo) {
   const dataSinal = evento.data_sinal ? formatarData(evento.data_sinal) : "data combinada entre as partes";
   const dataFesta = evento.data ? formatarData(evento.data) : "dia da festa";
   const pixTexto = temPix
-    ? ` via pix${evento.chave_pix ? ` ${escaparHtml(evento.chave_pix)}` : ""}${evento.nome_pix ? ` (${escaparHtml(evento.nome_pix)})` : ""}`
+    ? ` via Pix${evento.chave_pix ? ` ${escaparHtml(evento.chave_pix)}` : ""}${evento.nome_pix ? ` (${escaparHtml(evento.nome_pix)})` : ""}`
     : formas.length ? ` via ${escaparHtml(formas.join(", "))}` : "";
 
   if (sinal > 0) {
-    return `O pagamento e feito da seguinte forma: ${percentualSinal}%, no valor de ${moeda(sinal)}${pixTexto}, no dia ${dataSinal}, e o restante, no valor de ${moeda(saldo)}, no dia da festa, ${dataFesta}.`;
+    return `O pagamento é feito da seguinte forma: ${percentualSinal}%, no valor de ${moeda(sinal)}${pixTexto}, no dia ${dataSinal}, e o restante, no valor de ${moeda(saldo)}, no dia da festa, ${dataFesta}.`;
   }
 
-  return `O pagamento e feito no valor total de ${moeda(valor)}${pixTexto}, no dia da festa, ${dataFesta}.`;
+  return `O pagamento é feito no valor total de ${moeda(valor)}${pixTexto}, no dia da festa, ${dataFesta}.`;
 }
 
 function textoParaLista(valor) {
