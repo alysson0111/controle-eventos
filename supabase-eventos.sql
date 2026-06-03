@@ -120,4 +120,75 @@ using (auth.uid() = user_id);
 create index if not exists itens_catalogo_user_id_nome_idx
 on public.itens_catalogo (user_id, nome);
 
+create table if not exists public.custos (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  evento_id uuid references public.eventos(id) on delete set null,
+  descricao text not null,
+  valor numeric(12, 2) not null default 0,
+  data date not null default current_date,
+  observacao text default '',
+  created_at timestamptz not null default now()
+);
+
+alter table public.custos enable row level security;
+
+drop policy if exists "Usuarios podem ver seus custos" on public.custos;
+drop policy if exists "Usuarios podem criar seus custos" on public.custos;
+drop policy if exists "Usuarios podem editar seus custos" on public.custos;
+drop policy if exists "Usuarios podem excluir seus custos" on public.custos;
+
+create policy "Usuarios podem ver seus custos"
+on public.custos
+for select
+to authenticated
+using (auth.uid() = user_id);
+
+create policy "Usuarios podem criar seus custos"
+on public.custos
+for insert
+to authenticated
+with check (
+  auth.uid() = user_id
+  and (
+    evento_id is null
+    or exists (
+      select 1
+      from public.eventos
+      where eventos.id = custos.evento_id
+        and eventos.user_id = auth.uid()
+    )
+  )
+);
+
+create policy "Usuarios podem editar seus custos"
+on public.custos
+for update
+to authenticated
+using (auth.uid() = user_id)
+with check (
+  auth.uid() = user_id
+  and (
+    evento_id is null
+    or exists (
+      select 1
+      from public.eventos
+      where eventos.id = custos.evento_id
+        and eventos.user_id = auth.uid()
+    )
+  )
+);
+
+create policy "Usuarios podem excluir seus custos"
+on public.custos
+for delete
+to authenticated
+using (auth.uid() = user_id);
+
+create index if not exists custos_user_id_data_idx
+on public.custos (user_id, data);
+
+create index if not exists custos_user_id_evento_id_idx
+on public.custos (user_id, evento_id);
+
 notify pgrst, 'reload schema';

@@ -61,6 +61,14 @@ const catalogoItemInicial = {
   observacao: "",
 };
 
+const custoInicial = {
+  eventoId: "",
+  descricao: "",
+  valor: "",
+  data: new Date().toISOString().slice(0, 10),
+  observacao: "",
+};
+
 const tiposEvento = ["Aniversário", "Casamento", "Chá de fraldas", "Chá revelação", "Formatura"];
 
 const formasPagamento = ["Pix", "Cartao", "Dinheiro", "Boleto", "Transferencia"];
@@ -433,10 +441,14 @@ function SistemaEventos({ user }) {
   const [itensCatalogo, setItensCatalogo] = useState([]);
   const [catalogoForm, setCatalogoForm] = useState(catalogoItemInicial);
   const [editandoItemId, setEditandoItemId] = useState(null);
+  const [custos, setCustos] = useState([]);
+  const [custoForm, setCustoForm] = useState(custoInicial);
+  const [editandoCustoId, setEditandoCustoId] = useState(null);
 
   useEffect(() => {
     buscarEventos();
     buscarItensCatalogo();
+    buscarCustos();
   }, []);
 
   async function buscarEventos() {
@@ -476,6 +488,20 @@ function SistemaEventos({ user }) {
     setNomeEventoOutro(false);
     setItemForm(eventoItemInicial);
     setEditandoId(null);
+  }
+
+  async function buscarCustos() {
+    const { data, error } = await supabase
+      .from("custos")
+      .select("*")
+      .order("data", { ascending: false })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setErro(mensagemErroSupabase(error));
+    } else {
+      setCustos(data || []);
+    }
   }
 
   function adicionarItem() {
@@ -700,6 +726,77 @@ function SistemaEventos({ user }) {
     await supabase.auth.signOut();
   }
 
+  async function salvarCusto(e) {
+    e.preventDefault();
+    setErro("");
+
+    if (!custoForm.descricao.trim()) {
+      alert("Informe a descricao do custo.");
+      return;
+    }
+
+    const payload = {
+      user_id: user.id,
+      evento_id: custoForm.eventoId || null,
+      descricao: custoForm.descricao.trim(),
+      valor: Number(custoForm.valor || 0),
+      data: custoForm.data || new Date().toISOString().slice(0, 10),
+      observacao: custoForm.observacao.trim(),
+    };
+
+    if (editandoCustoId) {
+      const { error } = await supabase
+        .from("custos")
+        .update(payload)
+        .eq("id", editandoCustoId)
+        .eq("user_id", user.id);
+
+      if (error) {
+        setErro(mensagemErroSupabase(error));
+        return;
+      }
+    } else {
+      const { error } = await supabase.from("custos").insert(payload);
+
+      if (error) {
+        setErro(mensagemErroSupabase(error));
+        return;
+      }
+    }
+
+    setCustoForm(custoInicial);
+    setEditandoCustoId(null);
+    buscarCustos();
+  }
+
+  function editarCusto(custo) {
+    setEditandoCustoId(custo.id);
+    setCustoForm({
+      eventoId: custo.evento_id || "",
+      descricao: custo.descricao || "",
+      valor: String(custo.valor || ""),
+      data: custo.data || new Date().toISOString().slice(0, 10),
+      observacao: custo.observacao || "",
+    });
+  }
+
+  async function excluirCusto(id) {
+    if (!confirm("Deseja excluir este custo?")) return;
+
+    const { error } = await supabase
+      .from("custos")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (error) {
+      setErro(mensagemErroSupabase(error));
+      return;
+    }
+
+    buscarCustos();
+  }
+
   const eventosFiltrados = useMemo(() => {
     return eventos.filter((evento) => {
       const itensTexto = normalizarItens(evento.itens).map((item) => item.descricao).join(" ");
@@ -720,8 +817,10 @@ function SistemaEventos({ user }) {
     const eventosDoMes = eventos.filter((e) => (e.data || "").startsWith(mesFaturamento));
     const faturamentoMensal = eventosDoMes.reduce((soma, e) => soma + Number(e.valor || 0), 0);
     const itens = eventos.reduce((soma, e) => soma + normalizarItens(e.itens).length, 0);
-    return { total, confirmados, pendentes, cancelados, faturamento, faturamentoMensal, itens };
-  }, [eventos, mesFaturamento]);
+    const custosTotal = custos.reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
+    const custosGerais = custos.filter((custo) => !custo.evento_id).reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
+    return { total, confirmados, pendentes, cancelados, faturamento, faturamentoMensal, itens, custosTotal, custosGerais };
+  }, [eventos, mesFaturamento, custos]);
 
   const valorFaturamento = faturamentoModo === "mensal" ? resumo.faturamentoMensal : resumo.faturamento;
   const eventosRelatorio = useMemo(() => {
@@ -757,9 +856,10 @@ function SistemaEventos({ user }) {
       <main className="max-w-7xl mx-auto p-6 space-y-6">
         {erro && <div className="bg-red-50 text-red-700 border border-red-200 rounded-2xl p-4 font-semibold">{erro}</div>}
 
-        <nav className="bg-white/15 border border-white/25 rounded-3xl shadow-md shadow-cyan-950/20 p-2 grid grid-cols-1 sm:grid-cols-3 gap-2 backdrop-blur">
+        <nav className="bg-white/15 border border-white/25 rounded-3xl shadow-md shadow-cyan-950/20 p-2 grid grid-cols-1 sm:grid-cols-4 gap-2 backdrop-blur">
           <BotaoAba ativo={abaAtiva === "eventos"} onClick={() => setAbaAtiva("eventos")} icon={<CalendarDays size={18} />} texto="Novo Evento" />
           <BotaoAba ativo={abaAtiva === "itens"} onClick={() => setAbaAtiva("itens")} icon={<Package size={18} />} texto="Cadastrar Item" />
+          <BotaoAba ativo={abaAtiva === "custos"} onClick={() => setAbaAtiva("custos")} icon={<DollarSign size={18} />} texto="Custos" />
           <BotaoAba ativo={abaAtiva === "faturamento"} onClick={() => setAbaAtiva("faturamento")} icon={<DollarSign size={18} />} texto="Faturamento" />
         </nav>
 
@@ -807,6 +907,23 @@ function SistemaEventos({ user }) {
             setEditandoItemId(null);
           }}
         />
+        )}
+
+        {abaAtiva === "custos" && (
+          <CustosPainel
+            eventos={eventos}
+            custos={custos}
+            custoForm={custoForm}
+            setCustoForm={setCustoForm}
+            editandoCustoId={editandoCustoId}
+            salvarCusto={salvarCusto}
+            editarCusto={editarCusto}
+            excluirCusto={excluirCusto}
+            cancelarEdicao={() => {
+              setCustoForm(custoInicial);
+              setEditandoCustoId(null);
+            }}
+          />
         )}
 
         {abaAtiva === "eventos" && (
@@ -1120,6 +1237,175 @@ function CatalogoItens({
             </div>
           )}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function CustosPainel({
+  eventos,
+  custos,
+  custoForm,
+  setCustoForm,
+  editandoCustoId,
+  salvarCusto,
+  editarCusto,
+  excluirCusto,
+  cancelarEdicao,
+}) {
+  const custosPorEvento = useMemo(() => {
+    return eventos.map((evento) => {
+      const custosEvento = custos.filter((custo) => custo.evento_id === evento.id);
+      const totalCustos = custosEvento.reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
+      const valorEvento = Number(evento.valor || 0);
+
+      return {
+        evento,
+        custosEvento,
+        totalCustos,
+        valorLiquido: valorEvento - totalCustos,
+      };
+    });
+  }, [eventos, custos]);
+
+  const custosGerais = custos.filter((custo) => !custo.evento_id);
+  const totalCustos = custos.reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
+  const totalCustosVinculados = custos.filter((custo) => custo.evento_id).reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
+  const totalCustosGerais = custosGerais.reduce((soma, custo) => soma + Number(custo.valor || 0), 0);
+
+  function nomeEvento(custo) {
+    const evento = eventos.find((item) => item.id === custo.evento_id);
+    return evento ? `${evento.nome} - ${formatarData(evento.data)}` : "Custo geral";
+  }
+
+  return (
+    <section className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <CardResumo titulo="Custos Total" valor={moeda(totalCustos)} icon={<DollarSign />} />
+        <CardResumo titulo="Custos em Eventos" valor={moeda(totalCustosVinculados)} icon={<CalendarDays />} />
+        <CardResumo titulo="Custos Gerais" valor={moeda(totalCustosGerais)} icon={<Package />} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="bg-white/90 rounded-3xl shadow-lg shadow-amber-100/80 border border-amber-100 p-5">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="bg-gradient-to-br from-yellow-400 to-amber-500 text-cyan-950 p-2 rounded-2xl"><DollarSign size={20} /></div>
+            <h2 className="text-xl font-black">{editandoCustoId ? "Editar Custo" : "Novo Custo"}</h2>
+          </div>
+
+          <form onSubmit={salvarCusto} className="space-y-3">
+            <Campo label="Evento">
+              <select className="input" value={custoForm.eventoId} onChange={(e) => setCustoForm({ ...custoForm, eventoId: e.target.value })}>
+                <option value="">Custo geral, sem evento especifico</option>
+                {eventos.map((evento) => (
+                  <option key={evento.id} value={evento.id}>{evento.nome} - {formatarData(evento.data)}</option>
+                ))}
+              </select>
+            </Campo>
+
+            <Campo label="Descricao do custo">
+              <input className="input" value={custoForm.descricao} onChange={(e) => setCustoForm({ ...custoForm, descricao: e.target.value })} placeholder="Ex: Frete, material, ajudante..." />
+            </Campo>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Campo label="Valor R$">
+                <input type="number" step="0.01" className="input" value={custoForm.valor} onChange={(e) => setCustoForm({ ...custoForm, valor: e.target.value })} placeholder="0" />
+              </Campo>
+              <Campo label="Data">
+                <input type="date" className="input" value={custoForm.data} onChange={(e) => setCustoForm({ ...custoForm, data: e.target.value })} />
+              </Campo>
+            </div>
+
+            <Campo label="Observacao">
+              <textarea className="input min-h-[100px] resize-y" value={custoForm.observacao} onChange={(e) => setCustoForm({ ...custoForm, observacao: e.target.value })} placeholder="Detalhes do custo" />
+            </Campo>
+
+            <button className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-cyan-950 font-black py-3 rounded-2xl transition shadow-lg shadow-amber-300/40">
+              {editandoCustoId ? "Salvar Custo" : "Cadastrar Custo"}
+            </button>
+
+            {editandoCustoId && (
+              <button type="button" onClick={cancelarEdicao} className="w-full bg-amber-100 hover:bg-amber-200 text-amber-800 font-black py-3 rounded-2xl transition">
+                Cancelar edicao
+              </button>
+            )}
+          </form>
+        </div>
+
+        <div className="lg:col-span-2 bg-white/90 rounded-3xl shadow-lg shadow-cyan-100/80 border border-cyan-100 p-5">
+          <h2 className="text-xl font-black mb-4">Custos Cadastrados</h2>
+
+          {custos.length === 0 ? (
+            <div className="text-center py-10 text-slate-500 bg-amber-50 rounded-2xl border border-dashed border-amber-200">
+              Nenhum custo cadastrado.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {custos.map((custo) => (
+                <div key={custo.id} className="border border-amber-100 rounded-2xl p-4 bg-gradient-to-br from-white to-amber-50/60">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div>
+                      <p className="font-black text-slate-900">{custo.descricao}</p>
+                      <p className="text-sm text-slate-500">{nomeEvento(custo)} | {formatarData(custo.data)}</p>
+                      {custo.observacao && <p className="text-sm text-slate-600 mt-2">{custo.observacao}</p>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-red-600 whitespace-nowrap">{moeda(custo.valor)}</span>
+                      <button type="button" onClick={() => editarCusto(custo)} className="p-2 rounded-xl bg-cyan-100 text-cyan-700 hover:bg-cyan-200" title="Editar custo">
+                        <Edit size={16} />
+                      </button>
+                      <button type="button" onClick={() => excluirCusto(custo.id)} className="p-2 rounded-xl bg-red-100 text-red-700 hover:bg-red-200" title="Excluir custo">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-white/90 rounded-3xl shadow-lg shadow-cyan-100/80 border border-cyan-100 p-5">
+        <h2 className="text-xl font-black mb-4">Valor Liquido por Evento</h2>
+
+        {eventos.length === 0 ? (
+          <div className="text-center py-10 text-slate-500 bg-amber-50 rounded-2xl border border-dashed border-amber-200">
+            Cadastre eventos para calcular o valor liquido.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-slate-500 border-b border-amber-100">
+                  <th className="py-3 pr-4">Data</th>
+                  <th className="py-3 pr-4">Evento</th>
+                  <th className="py-3 text-right">Valor</th>
+                  <th className="py-3 text-right">Custos</th>
+                  <th className="py-3 text-right">Liquido</th>
+                </tr>
+              </thead>
+              <tbody>
+                {custosPorEvento.map(({ evento, totalCustos, valorLiquido }) => (
+                  <tr key={evento.id} className="border-b border-amber-50">
+                    <td className="py-3 pr-4 whitespace-nowrap">{formatarData(evento.data)}</td>
+                    <td className="py-3 pr-4 font-bold">{evento.nome}</td>
+                    <td className="py-3 text-right">{moeda(evento.valor)}</td>
+                    <td className="py-3 text-right text-red-600 font-bold">{moeda(totalCustos)}</td>
+                    <td className={`py-3 text-right font-black ${valorLiquido < 0 ? "text-red-600" : "text-cyan-700"}`}>{moeda(valorLiquido)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {custosGerais.length > 0 && (
+          <div className="mt-5 rounded-2xl border border-amber-100 bg-amber-50 p-4">
+            <p className="font-black text-slate-900">Custos gerais sem evento especifico: {moeda(totalCustosGerais)}</p>
+            <p className="text-sm text-slate-500 mt-1">Esses custos ficam separados e nao entram no liquido de um evento especifico.</p>
+          </div>
+        )}
       </div>
     </section>
   );
