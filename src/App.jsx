@@ -61,6 +61,8 @@ const catalogoItemInicial = {
   observacao: "",
 };
 
+const tiposEvento = ["Aniversário", "Casamento", "Chá de fraldas", "Chá revelação", "Formatura"];
+
 const formasPagamento = ["Pix", "Cartao", "Dinheiro", "Boleto", "Transferencia"];
 
 export default function App() {
@@ -426,6 +428,7 @@ function SistemaEventos({ user }) {
   const [editandoId, setEditandoId] = useState(null);
   const [erro, setErro] = useState("");
   const [form, setForm] = useState(formInicial);
+  const [nomeEventoOutro, setNomeEventoOutro] = useState(false);
   const [itemForm, setItemForm] = useState(eventoItemInicial);
   const [itensCatalogo, setItensCatalogo] = useState([]);
   const [catalogoForm, setCatalogoForm] = useState(catalogoItemInicial);
@@ -470,6 +473,7 @@ function SistemaEventos({ user }) {
 
   function limparFormulario() {
     setForm(formInicial);
+    setNomeEventoOutro(false);
     setItemForm(eventoItemInicial);
     setEditandoId(null);
   }
@@ -646,9 +650,11 @@ function SistemaEventos({ user }) {
   }
 
   function editarEvento(evento) {
+    const nomeEvento = evento.nome || "";
     setEditandoId(evento.id);
+    setNomeEventoOutro(Boolean(nomeEvento && !tiposEvento.includes(nomeEvento)));
     setForm({
-      nome: evento.nome || "",
+      nome: nomeEvento,
       tema: evento.tema || "",
       cliente: evento.cliente || "",
       clienteDocumento: evento.cliente_documento || "",
@@ -812,7 +818,35 @@ function SistemaEventos({ user }) {
             </div>
 
             <form onSubmit={salvarEvento} className="space-y-3">
-              <Campo label="Nome do evento"><input className="input" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Ex: Casamento, aniversario..." /></Campo>
+              <Campo label="Nome do evento">
+                <select
+                  className="input"
+                  value={nomeEventoOutro ? "Outros" : form.nome}
+                  onChange={(e) => {
+                    if (e.target.value === "Outros") {
+                      setNomeEventoOutro(true);
+                      setForm({ ...form, nome: "" });
+                      return;
+                    }
+
+                    setNomeEventoOutro(false);
+                    setForm({ ...form, nome: e.target.value });
+                  }}
+                >
+                  <option value="">Selecione o evento</option>
+                  {tiposEvento.map((tipo) => (
+                    <option key={tipo} value={tipo}>{tipo}</option>
+                  ))}
+                  <option value="Outros">Outros</option>
+                </select>
+              </Campo>
+
+              {nomeEventoOutro && (
+                <Campo label="Digite o nome do evento">
+                  <input className="input" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Digite o nome do evento" />
+                </Campo>
+              )}
+
               <Campo label="Tema"><input className="input" value={form.tema} onChange={(e) => setForm({ ...form, tema: e.target.value })} placeholder="Ex: Jardim encantado, tropical..." /></Campo>
 
               <div className="grid grid-cols-2 gap-3">
