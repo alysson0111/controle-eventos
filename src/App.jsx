@@ -820,10 +820,13 @@ function SistemaEventos({ user }) {
 
               <Campo label="Local"><input className="input" value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} placeholder="Local do evento" /></Campo>
 
-              <Campo label="Valor R$"><input type="number" className="input" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} placeholder="0" /></Campo>
+              <Campo label="Valor R$"><input type="number" step="0.01" className="input" value={form.valor} onChange={(e) => {
+                const valor = e.target.value;
+                setForm({ ...form, valor, sinal: valor ? String(Number(valor) / 2) : "" });
+              }} placeholder="0" /></Campo>
 
               <div className="grid grid-cols-2 gap-3">
-                <Campo label="Sinal R$"><input type="number" className="input" value={form.sinal} onChange={(e) => setForm({ ...form, sinal: e.target.value })} placeholder="0" /></Campo>
+                <Campo label="Sinal R$"><input type="number" step="0.01" className="input" value={form.sinal} onChange={(e) => setForm({ ...form, sinal: e.target.value })} placeholder="0" /></Campo>
                 <Campo label="Status">
                   <select className="input" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
                     <option>Pendente</option>
