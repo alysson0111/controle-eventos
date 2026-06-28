@@ -16,6 +16,7 @@ import {
   Mail,
   FileText,
   Package,
+  Copy,
 } from "lucide-react";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -705,6 +706,40 @@ function SistemaEventos({ user }) {
     setItemForm(eventoItemInicial);
   }
 
+  function copiarEvento(evento) {
+    if (!confirm("Deseja copiar este evento para criar um novo contrato?")) return;
+
+    const nomeEvento = evento.nome || "";
+    setEditandoId(null);
+    setNomeEventoOutro(Boolean(nomeEvento && !tiposEvento.includes(nomeEvento)));
+    setForm({
+      nome: nomeEvento,
+      tema: evento.tema || "",
+      cliente: evento.cliente || "",
+      clienteDocumento: evento.cliente_documento || "",
+      clienteTelefone: evento.cliente_telefone || "",
+      clienteEndereco: evento.cliente_endereco || "",
+      contratadaNome: evento.contratada_nome || "",
+      contratadaDocumento: evento.contratada_documento || "",
+      contratadaTelefone: evento.contratada_telefone || "",
+      data: evento.data || "",
+      horario: evento.horario || "",
+      local: evento.local || "",
+      valor: String(evento.valor || ""),
+      sinal: String(evento.sinal || ""),
+      dataSinal: evento.data_sinal || "",
+      formaPagamento: evento.forma_pagamento || "",
+      chavePix: evento.chave_pix || "",
+      nomePix: evento.nome_pix || "",
+      status: evento.status || "Pendente",
+      observacoes: evento.observacoes || "",
+      itens: normalizarItens(evento.itens).map((item) => ({ ...item, id: crypto.randomUUID() })),
+    });
+    setItemForm(eventoItemInicial);
+    setAbaAtiva("eventos");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   async function excluirEvento(id) {
     if (!confirm("Deseja excluir este evento?")) return;
 
@@ -1096,6 +1131,7 @@ function SistemaEventos({ user }) {
                     evento={evento}
                     user={user}
                     editarEvento={editarEvento}
+                    copiarEvento={copiarEvento}
                     excluirEvento={excluirEvento}
                   />
                 ))}
@@ -1522,7 +1558,7 @@ function PainelItens({ itemForm, setItemForm, itens, itensCatalogo, adicionarIte
   );
 }
 
-function EventoCard({ evento, user, editarEvento, excluirEvento }) {
+function EventoCard({ evento, user, editarEvento, copiarEvento, excluirEvento }) {
   const itens = normalizarItens(evento.itens);
 
   return (
@@ -1565,6 +1601,9 @@ function EventoCard({ evento, user, editarEvento, excluirEvento }) {
         <div className="flex gap-2">
           <button onClick={() => gerarContrato(evento, user)} className="p-3 rounded-2xl bg-teal-100 text-teal-700 hover:bg-teal-200 transition" title="Gerar contrato">
             <FileText size={18} />
+          </button>
+          <button onClick={() => copiarEvento(evento)} className="p-3 rounded-2xl bg-amber-100 text-amber-700 hover:bg-amber-200 transition" title="Copiar">
+            <Copy size={18} />
           </button>
           <button onClick={() => editarEvento(evento)} className="p-3 rounded-2xl bg-cyan-100 text-cyan-700 hover:bg-cyan-200 transition" title="Editar">
             <Edit size={18} />
