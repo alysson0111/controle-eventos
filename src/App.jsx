@@ -41,6 +41,7 @@ const formInicial = {
   local: "",
   valor: "",
   sinal: "",
+  pagamentoAvista: false,
   dataSinal: "",
   formaPagamento: "",
   chavePix: "",
@@ -642,7 +643,8 @@ function SistemaEventos({ user }) {
       horario: form.horario || null,
       local: form.local,
       valor: Number(form.valor || 0),
-      sinal: Number(form.sinal || 0),
+      sinal: form.pagamentoAvista ? 0 : Number(form.sinal || 0),
+      pagamento_avista: form.pagamentoAvista,
       data_sinal: form.dataSinal || null,
       forma_pagamento: form.formaPagamento,
       chave_pix: form.chavePix,
@@ -695,6 +697,7 @@ function SistemaEventos({ user }) {
       local: evento.local || "",
       valor: String(evento.valor || ""),
       sinal: String(evento.sinal || ""),
+      pagamentoAvista: Boolean(evento.pagamento_avista),
       dataSinal: evento.data_sinal || "",
       formaPagamento: evento.forma_pagamento || "",
       chavePix: evento.chave_pix || "",
@@ -726,7 +729,8 @@ function SistemaEventos({ user }) {
       horario: evento.horario || "",
       local: evento.local || "",
       valor: String(evento.valor || ""),
-      sinal: String(evento.sinal || ""),
+      sinal: evento.pagamento_avista ? "0" : String(evento.sinal || ""),
+      pagamentoAvista: Boolean(evento.pagamento_avista),
       dataSinal: evento.data_sinal || "",
       formaPagamento: evento.forma_pagamento || "",
       chavePix: evento.chave_pix || "",
@@ -1010,11 +1014,21 @@ function SistemaEventos({ user }) {
 
               <Campo label="Valor R$"><input type="number" step="0.01" className="input" value={form.valor} onChange={(e) => {
                 const valor = e.target.value;
-                setForm({ ...form, valor, sinal: valor ? String(Number(valor) / 2) : "" });
+                setForm({ ...form, valor, sinal: form.pagamentoAvista ? "0" : valor ? String(Number(valor) / 2) : "" });
               }} placeholder="0" /></Campo>
 
+              <label className="flex items-center gap-3 rounded-2xl border border-cyan-100 bg-cyan-50 p-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.pagamentoAvista}
+                  onChange={(e) => setForm({ ...form, pagamentoAvista: e.target.checked, sinal: e.target.checked ? "0" : form.valor ? String(Number(form.valor) / 2) : "" })}
+                  className="h-4 w-4 accent-cyan-600"
+                />
+                <span className="text-sm font-black text-cyan-800">Pagamento à vista, sem sinal</span>
+              </label>
+
               <div className="grid grid-cols-2 gap-3">
-                <Campo label="Sinal R$"><input type="number" step="0.01" className="input" value={form.sinal} onChange={(e) => setForm({ ...form, sinal: e.target.value })} placeholder="0" /></Campo>
+                <Campo label="Sinal R$"><input type="number" step="0.01" className="input" value={form.sinal} onChange={(e) => setForm({ ...form, sinal: e.target.value })} placeholder="0" disabled={form.pagamentoAvista} /></Campo>
                 <Campo label="Status">
                   <select className="input" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
                     <option>Pendente</option>
@@ -1679,6 +1693,7 @@ function montarContratoHtml(evento, user) {
   const itens = normalizarItens(evento.itens);
   const saldo = Number(evento.valor || 0) - Number(evento.sinal || 0);
   const pagamentoContrato = montarPagamentoContrato(evento, saldo);
+  const pagamentoAvista = Boolean(evento.pagamento_avista);
   const linhasItens = itens.length
     ? itens.map((item) => `
       <tr>
@@ -1761,13 +1776,13 @@ function montarContratoHtml(evento, user) {
 
   <h2>6. Informações importantes</h2>
   <p>
-    Os valores pagos em caráter de entrada em nenhuma hipótese serão devolvidos,
+    ${pagamentoAvista ? "Os valores pagos" : "Os valores pagos em caráter de entrada"} em nenhuma hipótese serão devolvidos,
     independentemente do motivo alegado pelo contratante.
   </p>
 
   <h2>7. Concordância</h2>
   <p>
-    O pagamento do sinal conforme item 4 caracteriza concordância integral deste contrato.
+    ${pagamentoAvista ? "O pagamento conforme item 4" : "O pagamento do sinal conforme item 4"} caracteriza concordância integral deste contrato.
   </p>
 
   <h2>8. Validade do contrato</h2>
@@ -1817,6 +1832,7 @@ function moeda(valor) {
 function montarPagamentoContrato(evento, saldo) {
   const valor = Number(evento.valor || 0);
   const sinal = Number(evento.sinal || 0);
+  const pagamentoAvista = Boolean(evento.pagamento_avista);
   const percentualSinal = valor > 0 && sinal > 0 ? Math.round((sinal / valor) * 100) : 0;
   const formas = textoParaLista(evento.forma_pagamento);
   const temPix = formas.includes("Pix");
@@ -1825,6 +1841,10 @@ function montarPagamentoContrato(evento, saldo) {
   const pixTexto = temPix
     ? ` via Pix${evento.chave_pix ? ` ${escaparHtml(evento.chave_pix)}` : ""}${evento.nome_pix ? ` (${escaparHtml(evento.nome_pix)})` : ""}`
     : formas.length ? ` via ${escaparHtml(formas.join(", "))}` : "";
+
+  if (pagamentoAvista) {
+    return `O pagamento é feito à vista, no valor total de ${moeda(valor)}${pixTexto}.`;
+  }
 
   if (sinal > 0) {
     return `O pagamento é feito da seguinte forma: ${percentualSinal}%, no valor de ${moeda(sinal)}${pixTexto}, no dia ${dataSinal}, e o restante, no valor de ${moeda(saldo)}, no dia da festa, ${dataFesta}.`;
