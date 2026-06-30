@@ -1843,7 +1843,7 @@ function montarPagamentoContrato(evento, saldo) {
     : formas.length ? ` via ${escaparHtml(formas.join(", "))}` : "";
 
   if (pagamentoAvista) {
-    return `O pagamento é feito à vista, no valor total de ${moeda(valor)}${pixTexto}.`;
+    return `O pagamento à vista já foi efetuado, no valor total de ${moeda(valor)}${pixTexto}. A data do pagamento consta no item 9, em Observações.`;
   }
 
   if (sinal > 0) {
