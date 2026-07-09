@@ -483,7 +483,7 @@ function SistemaEventos({ user }) {
       .order("created_at", { ascending: false });
 
     if (error) {
-      setErro(error.message);
+      setErro(mensagemErroSupabase(error));
     } else {
       setEventos(data || []);
     }
@@ -498,7 +498,7 @@ function SistemaEventos({ user }) {
       .order("nome", { ascending: true });
 
     if (error) {
-      setErro(error.message);
+      setErro(mensagemErroSupabase(error));
     } else {
       setItensCatalogo(data || []);
     }
@@ -595,14 +595,14 @@ function SistemaEventos({ user }) {
         .eq("user_id", user.id);
 
       if (error) {
-        setErro(error.message);
+        setErro(mensagemErroSupabase(error));
         return;
       }
     } else {
       const { error } = await supabase.from("itens_catalogo").insert(payload);
 
       if (error) {
-        setErro(error.message);
+        setErro(mensagemErroSupabase(error));
         return;
       }
     }
@@ -631,7 +631,7 @@ function SistemaEventos({ user }) {
       .eq("user_id", user.id);
 
     if (error) {
-      setErro(error.message);
+      setErro(mensagemErroSupabase(error));
       return;
     }
 
@@ -773,7 +773,7 @@ function SistemaEventos({ user }) {
       .eq("user_id", user.id);
 
     if (error) {
-      setErro(error.message);
+      setErro(mensagemErroSupabase(error));
       return;
     }
 
@@ -1883,6 +1883,10 @@ function textoParaLista(valor) {
 function mensagemErroSupabase(error) {
   const mensagem = error?.message || "Nao foi possivel salvar.";
   const texto = mensagem.toLowerCase();
+
+  if (texto.includes("failed to fetch") || texto.includes("networkerror") || texto.includes("fetch failed")) {
+    return "Não foi possível conectar ao Supabase. Verifique sua internet, as variáveis VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY no Vercel e se o projeto Supabase está ativo.";
+  }
 
   if (texto.includes("schema cache") || texto.includes("could not find") || texto.includes("column")) {
     return `${mensagem} Rode novamente o arquivo supabase-eventos.sql no SQL Editor do Supabase e recarregue o app.`;
