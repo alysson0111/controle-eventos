@@ -81,15 +81,30 @@ export default function App() {
   const [redefinindoSenha, setRedefinindoSenha] = useState(() => window.location.href.includes("type=recovery"));
 
   useEffect(() => {
+    let ativo = true;
+
     if (!supabase) {
       setLoadingAuth(false);
       return undefined;
     }
 
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoadingAuth(false);
+    const timeoutAuth = new Promise((resolve) => {
+      setTimeout(() => resolve({ data: { session: null } }), 6000);
     });
+
+    Promise.race([supabase.auth.getSession(), timeoutAuth])
+      .then(({ data }) => {
+        if (!ativo) return;
+        setSession(data.session);
+      })
+      .catch(() => {
+        if (!ativo) return;
+        setSession(null);
+      })
+      .finally(() => {
+        if (!ativo) return;
+        setLoadingAuth(false);
+      });
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, novaSession) => {
       if (event === "PASSWORD_RECOVERY") {
@@ -97,9 +112,13 @@ export default function App() {
       }
 
       setSession(novaSession);
+      setLoadingAuth(false);
     });
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      ativo = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   if (!supabaseConfigurado) {
