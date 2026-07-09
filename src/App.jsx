@@ -1221,6 +1221,7 @@ function RelatorioFaturamento({ eventos, valorFaturamento, modo, mes }) {
               <tr className="text-left text-slate-500 border-b border-amber-100">
                 <th className="py-3 pr-4">Data</th>
                 <th className="py-3 pr-4">Evento</th>
+                <th className="py-3 pr-4">Tema</th>
                 <th className="py-3 pr-4">Contratante</th>
                 <th className="py-3 pr-4">Status</th>
                 <th className="py-3 text-right">Valor</th>
@@ -1231,6 +1232,7 @@ function RelatorioFaturamento({ eventos, valorFaturamento, modo, mes }) {
                 <tr key={evento.id} className="border-b border-amber-50">
                   <td className="py-3 pr-4 whitespace-nowrap">{formatarData(evento.data)}</td>
                   <td className="py-3 pr-4 font-bold">{evento.nome}</td>
+                  <td className="py-3 pr-4">{evento.tema || "-"}</td>
                   <td className="py-3 pr-4">{evento.cliente}</td>
                   <td className="py-3 pr-4">{evento.status}</td>
                   <td className="py-3 text-right font-black">{moeda(evento.valor)}</td>
