@@ -169,7 +169,7 @@ function TelaLogin() {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
 
-    if (error) setMensagem(error.message);
+    if (error) setMensagem(mensagemErroSupabase(error));
     setLoading(false);
   }
 
@@ -181,7 +181,7 @@ function TelaLogin() {
     const { error } = await supabase.auth.signUp({ email, password: senha });
 
     if (error) {
-      setMensagem(error.message);
+      setMensagem(mensagemErroSupabase(error));
     } else {
       setMensagem("Cadastro criado. Se o Supabase pedir confirmacao, verifique seu e-mail.");
     }
@@ -203,7 +203,7 @@ function TelaLogin() {
     });
 
     if (error) {
-      setMensagem(error.message);
+      setMensagem(mensagemErroSupabase(error));
     } else {
       setMensagem("Enviamos um link para refazer sua senha. Verifique seu e-mail.");
     }
@@ -372,7 +372,7 @@ function TelaRedefinirSenha({ onConcluido }) {
     const { error } = await supabase.auth.updateUser({ password: senha });
 
     if (error) {
-      setMensagem(error.message);
+      setMensagem(mensagemErroSupabase(error));
     } else {
       setSucesso(true);
       setMensagem("Senha atualizada com sucesso.");
