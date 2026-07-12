@@ -75,6 +75,20 @@ const tiposEvento = ["Aniversário", "Casamento", "Chá de fraldas", "Chá revel
 
 const formasPagamento = ["Pix", "Cartao", "Dinheiro", "Boleto", "Transferencia"];
 
+const camposDestacadosAoCopiar = [
+  "nome",
+  "tema",
+  "data",
+  "horario",
+  "local",
+  "valor",
+  "dataSinal",
+  "cliente",
+  "clienteDocumento",
+  "clienteTelefone",
+  "clienteEndereco",
+];
+
 export default function App() {
   const [session, setSession] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -457,7 +471,7 @@ function SistemaEventos({ user }) {
   const [editandoId, setEditandoId] = useState(null);
   const [erro, setErro] = useState("");
   const [form, setForm] = useState(formInicial);
-  const [destacarCamposCopiados, setDestacarCamposCopiados] = useState(false);
+  const [camposCopiadosDestacados, setCamposCopiadosDestacados] = useState([]);
   const [nomeEventoOutro, setNomeEventoOutro] = useState(false);
   const [itemForm, setItemForm] = useState(eventoItemInicial);
   const [itensCatalogo, setItensCatalogo] = useState([]);
@@ -507,7 +521,7 @@ function SistemaEventos({ user }) {
 
   function limparFormulario() {
     setForm(formInicial);
-    setDestacarCamposCopiados(false);
+    setCamposCopiadosDestacados([]);
     setNomeEventoOutro(false);
     setItemForm(eventoItemInicial);
     setEditandoId(null);
@@ -702,7 +716,7 @@ function SistemaEventos({ user }) {
   function editarEvento(evento) {
     const nomeEvento = evento.nome || "";
     setEditandoId(evento.id);
-    setDestacarCamposCopiados(false);
+    setCamposCopiadosDestacados([]);
     setNomeEventoOutro(Boolean(nomeEvento && !tiposEvento.includes(nomeEvento)));
     setForm({
       nome: nomeEvento,
@@ -736,7 +750,7 @@ function SistemaEventos({ user }) {
 
     const nomeEvento = evento.nome || "";
     setEditandoId(null);
-    setDestacarCamposCopiados(true);
+    setCamposCopiadosDestacados(camposDestacadosAoCopiar);
     setNomeEventoOutro(Boolean(nomeEvento && !tiposEvento.includes(nomeEvento)));
     setForm({
       nome: nomeEvento,
@@ -892,7 +906,13 @@ function SistemaEventos({ user }) {
 
     return eventos;
   }, [eventos, faturamentoModo, mesFaturamento]);
-  const classeCampoCopiado = destacarCamposCopiados ? " input-copia" : "";
+  function classeCampoCopiado(campo) {
+    return camposCopiadosDestacados.includes(campo) ? " input-copia" : "";
+  }
+
+  function removerDestaqueCampo(campo) {
+    setCamposCopiadosDestacados((atuais) => atuais.filter((item) => item !== campo));
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyan-900 via-teal-700 to-cyan-600 text-slate-900">
@@ -1000,7 +1020,8 @@ function SistemaEventos({ user }) {
             <form onSubmit={salvarEvento} className="space-y-3">
               <Campo label="Nome do evento">
                 <select
-                  className={`input${classeCampoCopiado}`}
+                  className={`input${classeCampoCopiado("nome")}`}
+                  onBlur={() => removerDestaqueCampo("nome")}
                   value={nomeEventoOutro ? "Outros" : form.nome}
                   onChange={(e) => {
                     if (e.target.value === "Outros") {
@@ -1023,20 +1044,20 @@ function SistemaEventos({ user }) {
 
               {nomeEventoOutro && (
                 <Campo label="Digite o nome do evento">
-                  <input className={`input${classeCampoCopiado}`} value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Digite o nome do evento" />
+                  <input className={`input${classeCampoCopiado("nome")}`} onBlur={() => removerDestaqueCampo("nome")} value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Digite o nome do evento" />
                 </Campo>
               )}
 
-              <Campo label="Tema"><input className={`input${classeCampoCopiado}`} value={form.tema} onChange={(e) => setForm({ ...form, tema: e.target.value })} placeholder="Ex: Jardim encantado, tropical..." /></Campo>
+              <Campo label="Tema"><input className={`input${classeCampoCopiado("tema")}`} onBlur={() => removerDestaqueCampo("tema")} value={form.tema} onChange={(e) => setForm({ ...form, tema: e.target.value })} placeholder="Ex: Jardim encantado, tropical..." /></Campo>
 
               <div className="grid grid-cols-2 gap-3">
-                <Campo label="Data"><input type="date" className={`input${classeCampoCopiado}`} value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} /></Campo>
-                <Campo label="Horario"><input type="time" className={`input${classeCampoCopiado}`} value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} /></Campo>
+                <Campo label="Data"><input type="date" className={`input${classeCampoCopiado("data")}`} onBlur={() => removerDestaqueCampo("data")} value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} /></Campo>
+                <Campo label="Horario"><input type="time" className={`input${classeCampoCopiado("horario")}`} onBlur={() => removerDestaqueCampo("horario")} value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} /></Campo>
               </div>
 
-              <Campo label="Local"><input className={`input${classeCampoCopiado}`} value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} placeholder="Local do evento" /></Campo>
+              <Campo label="Local"><input className={`input${classeCampoCopiado("local")}`} onBlur={() => removerDestaqueCampo("local")} value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} placeholder="Local do evento" /></Campo>
 
-              <Campo label="Valor R$"><input type="number" step="0.01" className={`input${classeCampoCopiado}`} value={form.valor} onChange={(e) => {
+              <Campo label="Valor R$"><input type="number" step="0.01" className={`input${classeCampoCopiado("valor")}`} onBlur={() => removerDestaqueCampo("valor")} value={form.valor} onChange={(e) => {
                 const valor = e.target.value;
                 setForm({ ...form, valor, sinal: form.pagamentoAvista ? "0" : valor ? String(Number(valor) / 2) : "" });
               }} placeholder="0" /></Campo>
@@ -1063,17 +1084,17 @@ function SistemaEventos({ user }) {
               </div>
 
               <Campo label="Data para pagamento do sinal">
-                <input type="date" className={`input${classeCampoCopiado}`} value={form.dataSinal} onChange={(e) => setForm({ ...form, dataSinal: e.target.value })} />
+                <input type="date" className={`input${classeCampoCopiado("dataSinal")}`} onBlur={() => removerDestaqueCampo("dataSinal")} value={form.dataSinal} onChange={(e) => setForm({ ...form, dataSinal: e.target.value })} />
               </Campo>
 
-              <Campo label="Nome da contratante"><input className={`input${classeCampoCopiado}`} value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Nome da contratante" /></Campo>
+              <Campo label="Nome da contratante"><input className={`input${classeCampoCopiado("cliente")}`} onBlur={() => removerDestaqueCampo("cliente")} value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Nome da contratante" /></Campo>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Campo label="CPF/CNPJ"><input className={`input${classeCampoCopiado}`} value={form.clienteDocumento} onChange={(e) => setForm({ ...form, clienteDocumento: formatarCpf(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteDocumento", formatarCpf)} placeholder="000.000.000-00" /></Campo>
-                <Campo label="Telefone"><input className={`input${classeCampoCopiado}`} value={form.clienteTelefone} onChange={(e) => setForm({ ...form, clienteTelefone: formatarTelefone(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteTelefone", formatarTelefone)} placeholder="(000) 0 0000-0000" /></Campo>
+                <Campo label="CPF/CNPJ"><input className={`input${classeCampoCopiado("clienteDocumento")}`} onBlur={() => removerDestaqueCampo("clienteDocumento")} value={form.clienteDocumento} onChange={(e) => setForm({ ...form, clienteDocumento: formatarCpf(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteDocumento", formatarCpf)} placeholder="000.000.000-00" /></Campo>
+                <Campo label="Telefone"><input className={`input${classeCampoCopiado("clienteTelefone")}`} onBlur={() => removerDestaqueCampo("clienteTelefone")} value={form.clienteTelefone} onChange={(e) => setForm({ ...form, clienteTelefone: formatarTelefone(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteTelefone", formatarTelefone)} placeholder="(000) 0 0000-0000" /></Campo>
               </div>
 
-              <Campo label="Endereco do cliente"><input className={`input${classeCampoCopiado}`} value={form.clienteEndereco} onChange={(e) => setForm({ ...form, clienteEndereco: e.target.value })} placeholder="Rua, numero, cidade" /></Campo>
+              <Campo label="Endereco do cliente"><input className={`input${classeCampoCopiado("clienteEndereco")}`} onBlur={() => removerDestaqueCampo("clienteEndereco")} value={form.clienteEndereco} onChange={(e) => setForm({ ...form, clienteEndereco: e.target.value })} placeholder="Rua, numero, cidade" /></Campo>
               <Campo label="Nome da contratada"><input className="input" value={form.contratadaNome} onChange={(e) => setForm({ ...form, contratadaNome: e.target.value })} placeholder="Nome da contratada" /></Campo>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
