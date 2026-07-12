@@ -1602,10 +1602,10 @@ function PainelItens({ itemForm, setItemForm, itens, itensCatalogo, adicionarIte
 
       {itens.length > 0 && (
         <div className="space-y-2">
-          {itens.map((item) => (
+          {itens.map((item, index) => (
             <div key={item.id} className="flex items-center justify-between gap-3 bg-white border border-cyan-100 rounded-2xl p-4 shadow-sm">
               <div className="min-w-0">
-                <p className="font-black text-sm text-slate-900 truncate">{item.descricao}</p>
+                <p className="font-black text-sm text-slate-900 truncate">{index + 1}. {item.descricao}</p>
                 <p className="text-xs text-slate-500">{item.quantidade} {item.unidade}{item.observacao ? ` - ${item.observacao}` : ""}</p>
               </div>
               <button type="button" onClick={() => removerItem(item.id)} className="shrink-0 bg-red-50 text-red-600 hover:bg-red-100 p-2 rounded-xl transition" title="Remover item">
@@ -1647,9 +1647,9 @@ function EventoCard({ evento, user, editarEvento, copiarEvento, excluirEvento })
                 <span>{itens.length} itens cadastrados</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {itens.map((item) => (
+                {itens.map((item, index) => (
                   <span key={item.id} className="bg-white border border-cyan-100 rounded-full px-3 py-1 text-xs font-bold text-slate-700">
-                    {item.quantidade} {item.unidade} - {item.descricao}
+                    {index + 1}. {item.quantidade} {item.unidade} - {item.descricao}
                   </span>
                 ))}
               </div>
@@ -1742,15 +1742,16 @@ function montarContratoHtml(evento, user) {
   const pagamentoContrato = montarPagamentoContrato(evento, saldo);
   const pagamentoAvista = Boolean(evento.pagamento_avista);
   const linhasItens = itens.length
-    ? itens.map((item) => `
+    ? itens.map((item, index) => `
       <tr>
+        <td>${index + 1}</td>
         <td>${escaparHtml(item.descricao)}</td>
         <td>${item.quantidade}</td>
         <td>${escaparHtml(item.unidade)}</td>
         <td>${escaparHtml(item.observacao || "-")}</td>
       </tr>
     `).join("")
-    : `<tr><td colspan="4">Nenhum item cadastrado.</td></tr>`;
+    : `<tr><td colspan="5">Nenhum item cadastrado.</td></tr>`;
 
   return `<!doctype html>
 <html lang="pt-BR">
@@ -1802,7 +1803,7 @@ function montarContratoHtml(evento, user) {
   <h2>3. Itens e materiais incluídos</h2>
   <table>
     <thead>
-      <tr><th>Item</th><th>Qtd.</th><th>Unidade</th><th>Observação</th></tr>
+      <tr><th>Nº</th><th>Item</th><th>Qtd.</th><th>Unidade</th><th>Observação</th></tr>
     </thead>
     <tbody>${linhasItens}</tbody>
   </table>
