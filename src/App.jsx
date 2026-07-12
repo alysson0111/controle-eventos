@@ -1063,17 +1063,17 @@ function SistemaEventos({ user }) {
               </div>
 
               <Campo label="Data para pagamento do sinal">
-                <input type="date" className="input" value={form.dataSinal} onChange={(e) => setForm({ ...form, dataSinal: e.target.value })} />
+                <input type="date" className={`input${classeCampoCopiado}`} value={form.dataSinal} onChange={(e) => setForm({ ...form, dataSinal: e.target.value })} />
               </Campo>
 
-              <Campo label="Nome da contratante"><input className="input" value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Nome da contratante" /></Campo>
+              <Campo label="Nome da contratante"><input className={`input${classeCampoCopiado}`} value={form.cliente} onChange={(e) => setForm({ ...form, cliente: e.target.value })} placeholder="Nome da contratante" /></Campo>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Campo label="CPF/CNPJ"><input className="input" value={form.clienteDocumento} onChange={(e) => setForm({ ...form, clienteDocumento: formatarCpf(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteDocumento", formatarCpf)} placeholder="000.000.000-00" /></Campo>
-                <Campo label="Telefone"><input className="input" value={form.clienteTelefone} onChange={(e) => setForm({ ...form, clienteTelefone: formatarTelefone(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteTelefone", formatarTelefone)} placeholder="(000) 0 0000-0000" /></Campo>
+                <Campo label="CPF/CNPJ"><input className={`input${classeCampoCopiado}`} value={form.clienteDocumento} onChange={(e) => setForm({ ...form, clienteDocumento: formatarCpf(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteDocumento", formatarCpf)} placeholder="000.000.000-00" /></Campo>
+                <Campo label="Telefone"><input className={`input${classeCampoCopiado}`} value={form.clienteTelefone} onChange={(e) => setForm({ ...form, clienteTelefone: formatarTelefone(e.target.value) })} onPaste={(e) => colarFormatado(e, "clienteTelefone", formatarTelefone)} placeholder="(000) 0 0000-0000" /></Campo>
               </div>
 
-              <Campo label="Endereco do cliente"><input className="input" value={form.clienteEndereco} onChange={(e) => setForm({ ...form, clienteEndereco: e.target.value })} placeholder="Rua, numero, cidade" /></Campo>
+              <Campo label="Endereco do cliente"><input className={`input${classeCampoCopiado}`} value={form.clienteEndereco} onChange={(e) => setForm({ ...form, clienteEndereco: e.target.value })} placeholder="Rua, numero, cidade" /></Campo>
               <Campo label="Nome da contratada"><input className="input" value={form.contratadaNome} onChange={(e) => setForm({ ...form, contratadaNome: e.target.value })} placeholder="Nome da contratada" /></Campo>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
