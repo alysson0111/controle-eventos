@@ -457,6 +457,7 @@ function SistemaEventos({ user }) {
   const [editandoId, setEditandoId] = useState(null);
   const [erro, setErro] = useState("");
   const [form, setForm] = useState(formInicial);
+  const [destacarCamposCopiados, setDestacarCamposCopiados] = useState(false);
   const [nomeEventoOutro, setNomeEventoOutro] = useState(false);
   const [itemForm, setItemForm] = useState(eventoItemInicial);
   const [itensCatalogo, setItensCatalogo] = useState([]);
@@ -506,6 +507,7 @@ function SistemaEventos({ user }) {
 
   function limparFormulario() {
     setForm(formInicial);
+    setDestacarCamposCopiados(false);
     setNomeEventoOutro(false);
     setItemForm(eventoItemInicial);
     setEditandoId(null);
@@ -700,6 +702,7 @@ function SistemaEventos({ user }) {
   function editarEvento(evento) {
     const nomeEvento = evento.nome || "";
     setEditandoId(evento.id);
+    setDestacarCamposCopiados(false);
     setNomeEventoOutro(Boolean(nomeEvento && !tiposEvento.includes(nomeEvento)));
     setForm({
       nome: nomeEvento,
@@ -733,6 +736,7 @@ function SistemaEventos({ user }) {
 
     const nomeEvento = evento.nome || "";
     setEditandoId(null);
+    setDestacarCamposCopiados(true);
     setNomeEventoOutro(Boolean(nomeEvento && !tiposEvento.includes(nomeEvento)));
     setForm({
       nome: nomeEvento,
@@ -888,6 +892,7 @@ function SistemaEventos({ user }) {
 
     return eventos;
   }, [eventos, faturamentoModo, mesFaturamento]);
+  const classeCampoCopiado = destacarCamposCopiados ? " input-copia" : "";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyan-900 via-teal-700 to-cyan-600 text-slate-900">
@@ -995,7 +1000,7 @@ function SistemaEventos({ user }) {
             <form onSubmit={salvarEvento} className="space-y-3">
               <Campo label="Nome do evento">
                 <select
-                  className="input"
+                  className={`input${classeCampoCopiado}`}
                   value={nomeEventoOutro ? "Outros" : form.nome}
                   onChange={(e) => {
                     if (e.target.value === "Outros") {
@@ -1018,20 +1023,20 @@ function SistemaEventos({ user }) {
 
               {nomeEventoOutro && (
                 <Campo label="Digite o nome do evento">
-                  <input className="input" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Digite o nome do evento" />
+                  <input className={`input${classeCampoCopiado}`} value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Digite o nome do evento" />
                 </Campo>
               )}
 
-              <Campo label="Tema"><input className="input" value={form.tema} onChange={(e) => setForm({ ...form, tema: e.target.value })} placeholder="Ex: Jardim encantado, tropical..." /></Campo>
+              <Campo label="Tema"><input className={`input${classeCampoCopiado}`} value={form.tema} onChange={(e) => setForm({ ...form, tema: e.target.value })} placeholder="Ex: Jardim encantado, tropical..." /></Campo>
 
               <div className="grid grid-cols-2 gap-3">
-                <Campo label="Data"><input type="date" className="input" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} /></Campo>
-                <Campo label="Horario"><input type="time" className="input" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} /></Campo>
+                <Campo label="Data"><input type="date" className={`input${classeCampoCopiado}`} value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} /></Campo>
+                <Campo label="Horario"><input type="time" className={`input${classeCampoCopiado}`} value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} /></Campo>
               </div>
 
-              <Campo label="Local"><input className="input" value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} placeholder="Local do evento" /></Campo>
+              <Campo label="Local"><input className={`input${classeCampoCopiado}`} value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} placeholder="Local do evento" /></Campo>
 
-              <Campo label="Valor R$"><input type="number" step="0.01" className="input" value={form.valor} onChange={(e) => {
+              <Campo label="Valor R$"><input type="number" step="0.01" className={`input${classeCampoCopiado}`} value={form.valor} onChange={(e) => {
                 const valor = e.target.value;
                 setForm({ ...form, valor, sinal: form.pagamentoAvista ? "0" : valor ? String(Number(valor) / 2) : "" });
               }} placeholder="0" /></Campo>

@@ -26,5 +26,15 @@ body {
     border-color: #ffc629;
     box-shadow: 0 0 0 3px rgba(255, 198, 41, 0.22);
   }
+
+  .input.input-copia {
+    background: #fef2f2;
+    border-color: #fca5a5;
+  }
+
+  .input.input-copia:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+  }
 }
 
