@@ -1151,7 +1151,6 @@ function SistemaEventos({ user }) {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
               <div>
                 <h2 className="text-xl font-black">Eventos Cadastrados</h2>
-                <p className="text-sm text-slate-500">Dados carregados direto do Supabase.</p>
               </div>
 
               <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-nowrap md:flex-1 md:justify-end">
